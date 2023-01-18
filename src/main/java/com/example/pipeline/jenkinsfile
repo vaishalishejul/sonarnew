@@ -28,6 +28,8 @@ pipeline {
             steps {
                 echo 'hi,jdk'
                 sh 'java-version'
+                }
+           }
 
 
     }
