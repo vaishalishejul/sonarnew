@@ -28,7 +28,7 @@ pipeline {
             steps {
                 echo 'heool,jdk'
                 sh 'java-version'
-				
+	}			
 
     }
 }
