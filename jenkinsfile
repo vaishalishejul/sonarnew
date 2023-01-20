@@ -24,13 +24,7 @@ pipeline {
 		echo 'code packing is completed'
             }
         }
-        stage('docker image tag') {
-            steps {
-                echo 'heool,jdk'
-                sh 'java-version'
-		echo 'code tag is completed'
-	}			
-
+      
     }
 }
 }
