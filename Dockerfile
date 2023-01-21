@@ -1,4 +1,4 @@
-#This is a sample Image
+
 FROM ubuntu
 MAINTAINER vaishali@gmail.com
 
