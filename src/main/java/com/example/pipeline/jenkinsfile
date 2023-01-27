@@ -1,7 +1,7 @@
 pipeline {
 
     options {
-        buildDiscarded (logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
+        buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '2'))
     }
 
     agent any
@@ -17,20 +17,55 @@ pipeline {
 				echo 'code compilation is completed'
             }
         }
-        stage('Code Package') {
+          stage('Building & Tag Docker Image') {
             steps {
-                echo 'code packing is starting'
-                sh 'mvn clean package'
-				echo 'code packing is completed'
+                echo 'Starting Building Docker Image'
+                sh 'docker build -t vaishalishejul/pipeline-jenkins .'
+                sh 'docker build -t pipeline-jenkins .'
+                echo 'Completed  Building Docker Image'
             }
         }
-        stage('docker image tag') {
+        stage('Docker Image Scanning') {
             steps {
-                echo 'hi,jdk'
-                sh 'java-version'
+                echo 'Docker Image Scanning Started'
+                sh 'java -version'
+                echo 'Docker Image Scanning Started'
+            }
+        }
+        stage(' Docker push to Docker Hub') {
+                   steps {
+                      script {
+                         withCredentials([string(credentialsId: 'dockerhubCred', variable: 'dockerhubCred')]){
+                         sh 'docker login -u vaishalishejul -p ${dockerhubCred}'
+                         echo "Push Docker Image to DockerHub : In Progress"
+                         sh 'docker push vaishalishejul/pipeline:first'
+                         echo "Push Docker Image to DockerHub : In Progress"
+                         sh 'whoami'
+                         }
+                      }
+                    }
                 }
+
+               stage(' Docker Image Push to Amazon ECR') {
+           steps {
+              script {
+                 withDockerRegistry([credentialsId:'ecr:ap-south-1:awscred', url:"https://026145495181.dkr.ecr.ap-south-1.amazonaws.com"]){
+                 sh """
+                 echo "List the docker images present in local"
+                 docker images
+                 echo "Tagging the Docker Image: In Progress"
+		 docker tag piplinawsecr:latest 034692783810.dkr.ecr.ap-south-1.amazonaws.com/piplinawsecr:latest
+                 echo "Tagging the Docker Image: Completed"
+                 echo "Push Docker Image to ECR : In Progress"
+                 docker push 034692783810.dkr.ecr.ap-south-1.amazonaws.com/piplinawsecr:latest
+                 echo "Push Docker Image to ECR : Completed"
+                 """
+                 }
+              }
            }
+        }
 
 
     }
+
 }
