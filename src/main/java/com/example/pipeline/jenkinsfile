@@ -17,6 +17,14 @@ pipeline {
 				echo 'code compilation is completed'
             }
         }
+        stage('code packaging')
+        		{
+        						steps
+        						{
+        						echo 'code packaging started'
+        						sh 'mvn clean package'
+        						echo 'code packaging finished'
+        						}
           stage('Building & Tag Docker Image') {
             steps {
                 echo 'Starting Building Docker Image'
